@@ -121,7 +121,13 @@ languages = {
 # processor = AutoImageProcessor.from_pretrained("linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification")
 # model = AutoModelForImageClassification.from_pretrained("linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification")
 
-HF_API_KEY = "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"  # Replace with your Hugging Face API key
+# Access the Hugging Face API key from Streamlit secrets
+try:
+    HF_API_KEY = st.secrets["HF_API_KEY"]
+except (KeyError, FileNotFoundError):
+    st.error("Hugging Face API key not found. Please add it to your Streamlit secrets.")
+    HF_API_KEY = ""
+
 HF_API_URL_DISEASE = "https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
 # Disease treatment database
 DISEASE_TREATMENTS = {
@@ -158,6 +164,20 @@ KERALA_CROPS_DATA = {
 }
 
 # ------------------ AI Functions ------------------
+import pickle
+
+# Load the trained ML model
+@st.cache_resource
+def load_crop_model():
+    """Loads the trained crop recommendation model."""
+    try:
+        with open('crop_model.pkl', 'rb') as f:
+            model = pickle.load(f)
+        return model
+    except FileNotFoundError:
+        st.error("Crop recommendation model not found. Please train the model first.")
+        return None
+
 @st.cache_data(ttl=300)  # Cache for 5 minutes
 def detect_plant_disease(image_bytes):
     """
@@ -201,43 +221,48 @@ def detect_plant_disease(image_bytes):
 
 def ai_crop_recommender(ph, nitrogen, phosphorus, potassium, rainfall, temperature, season):
     """
-    AI-powered crop recommendation system for Kerala
+    AI-powered crop recommendation system for Kerala using a trained ML model.
     """
     try:
-        recommendations = []
-        
+        model = load_crop_model()
+        if model is None:
+            return []
+
         # Get current weather data for temperature if not provided
         if temperature is None:
             temperature = 26  # Default Kerala temperature
+
+        # Create a DataFrame for the input features
+        input_data = pd.DataFrame({
+            'temperature': [temperature],
+            'rainfall': [rainfall],
+            'ph': [ph],
+            'nitrogen': [nitrogen],
+            'phosphorus': [phosphorus],
+            'potassium': [potassium]
+        })
+
+        # Get prediction probabilities
+        probabilities = model.predict_proba(input_data)[0]
         
-        for crop, requirements in KERALA_CROPS_DATA.items():
-            # Calculate suitability score based on multiple factors
-            ph_score = 1 - abs(ph - ((requirements['ph_min'] + requirements['ph_max']) / 2)) / 2
-            ph_score = max(0, ph_score)
-            
-            rainfall_score = 1 if requirements['rainfall_min'] <= rainfall <= requirements['rainfall_max'] else 0.5
-            
-            temp_score = 1 - abs(temperature - requirements['temp_opt']) / 10
-            temp_score = max(0, temp_score)
-            
-            # Simple nutrient scoring (basic logic)
-            nutrient_score = min(1, (nitrogen + phosphorus + potassium) / 300)
-            
-            # Calculate overall score
-            overall_score = (ph_score * 0.3 + rainfall_score * 0.3 + temp_score * 0.2 + nutrient_score * 0.2)
-            
-            if overall_score > 0.5:  # Only recommend if score is above threshold
-                recommendations.append({
-                    'crop': crop,
-                    'score': round(overall_score * 100, 1),
-                    'suitability': 'High' if overall_score > 0.8 else 'Medium' if overall_score > 0.6 else 'Low'
-                })
-        
-        # Sort by score
+        # Create a list of recommendations
+        recommendations = []
+        for i, prob in enumerate(probabilities):
+            suitability = 'High' if prob > 0.2 else ('Medium' if prob > 0.05 else 'Low')
+            recommendations.append({
+                'crop': model.classes_[i],
+                'score': round(prob * 100, 1),
+                'suitability': suitability
+            })
+
+        # Sort by score and filter out very low scores
         recommendations.sort(key=lambda x: x['score'], reverse=True)
         
+        # Filter to only show recommendations with a score > 1%
+        recommendations = [rec for rec in recommendations if rec['score'] > 1]
+
         return recommendations[:5]  # Return top 5 recommendations
-        
+
     except Exception as e:
         st.error(f"Error in crop recommendation: {str(e)}")
         return []
