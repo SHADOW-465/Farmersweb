@@ -1,21 +1,21 @@
-temperature,rainfall,ph,nitrogen,phosphorus,potassium,crop
-25.1,1500,6.0,40,20,30,Rice
-27.2,1800,5.5,42,21,32,Rice
-28.3,2000,7.0,87,56,210,Coconut
-27.5,1500,6.0,85,55,200,Coconut
-24.9,1800,6.5,80,80,240,Pepper
-25.3,1600,6.0,82,78,235,Pepper
-23.1,3000,6.0,80,80,160,Cardamom
-22.8,2500,5.8,78,82,155,Cardamom
-27.2,2000,6.0,30,30,30,Rubber
-26.8,2200,5.5,28,31,29,Rubber
-21.9,2000,5.0,300,90,300,Tea
-22.3,1800,5.5,295,92,290,Tea
-24.1,1800,6.5,250,40,325,Coffee
-23.8,1700,6.2,245,41,320,Coffee
-26.9,1500,6.0,500,250,975,Banana
-27.3,1600,6.5,490,245,970,Banana
-25.2,2000,6.0,75,50,50,Ginger
-24.8,2500,6.2,73,51,48,Ginger
-26.1,1200,6.5,60,50,120,Turmeric
-25.9,1300,6.8,58,49,118,Turmeric
+temperature,rainfall,ph,nitrogen,phosphorus,potassium,crop,soil_type,season
+25.1,1500,6.0,40,20,30,Rice,Alluvial,Kharif
+27.2,1800,5.5,42,21,32,Rice,Alluvial,Kharif
+28.3,2000,7.0,87,56,210,Coconut,Coastal Sandy,All Seasons
+27.5,1500,6.0,85,55,200,Coconut,Coastal Sandy,All Seasons
+24.9,1800,6.5,80,80,240,Pepper,Laterite,Kharif
+25.3,1600,6.0,82,78,235,Pepper,Laterite,Kharif
+23.1,3000,6.0,80,80,160,Cardamom,Red,Rabi
+22.8,2500,5.8,78,82,155,Cardamom,Red,Rabi
+27.2,2000,6.0,30,30,30,Rubber,Laterite,All Seasons
+26.8,2200,5.5,28,31,29,Rubber,Laterite,All Seasons
+21.9,2000,5.0,300,90,300,Tea,Laterite,All Seasons
+22.3,1800,5.5,295,92,290,Tea,Laterite,All Seasons
+24.1,1800,6.5,250,40,325,Coffee,Red,Rabi
+23.8,1700,6.2,245,41,320,Coffee,Red,Rabi
+26.9,1500,6.0,500,250,975,Banana,Alluvial,All Seasons
+27.3,1600,6.5,490,245,970,Banana,Alluvial,All Seasons
+25.2,2000,6.0,75,50,50,Ginger,Laterite,Kharif
+24.8,2500,6.2,73,51,48,Ginger,Laterite,Kharif
+26.1,1200,6.5,60,50,120,Turmeric,Red,Rabi
+25.9,1300,6.8,58,49,118,Turmeric,Red,Rabi
